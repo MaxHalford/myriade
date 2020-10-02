@@ -14,7 +14,8 @@ setuptools.setup(
     url='https://github.com/MaxHalford/myriad',
     packages=setuptools.find_packages(),
     install_requires=[
-        'anytree'
+        'scikit-learn',
+        'svmloader'
     ],
     classifiers=[
         'Programming Language :: Python :: 3',

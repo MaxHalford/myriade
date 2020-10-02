@@ -186,8 +186,8 @@ def iter_trees(labels, k: int = None):
     1  2   1  3   2  3
 
     Therefore, structural symmetries as well as label permutations are not ignored. The reason why
-    is that we only want to consider trees that lead to a different hierarchy of models, and thus a different
-    predictive power. Indeed, all of the following trees are considered to be equivalent:
+    is that we only want to consider trees that lead to a different hierarchy of models, and thus a
+    different predictive power. Indeed, all of the following trees are equivalent in our case:
 
       /\     /\     /\     /\
      /\ 3   /\ 3   3 /\   3 /\
