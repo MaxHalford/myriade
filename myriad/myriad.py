@@ -16,20 +16,13 @@ __all__ = [
 
 class Branch:
 
-    def __init__(self, left, right):
+    def __init__(self, left, right, model=None):
         self.left = left
         self.right = right
+        self.model = model
 
     def to_html(self):
-        """Render an HTML tree representation.
-
-        >>> tree = myriad.Branch(
-        ...     myriad.Branch(1, 2),
-        ...     myriad.Branch(3, 4)
-        ... )
-        >>> tree.to_html()
-
-        """
+        """Render an HTML tree representation."""
 
         def _to_html(el):
             if isinstance(el, Branch):
@@ -107,7 +100,7 @@ class LabelTreeClassifier(base.BaseEstimator, base.ClassifierMixin):
         else:
             tree = copy.deepcopy(self.prior_tree)
 
-        mask = train(X, y, self.classifier, tree)
+        mask = train(tree, self.classifier, X, y)
 
         # mask necessarily contains only Trues if the tree contains each label, therefore we
         # know that labels are missing if mask contains Falses
@@ -130,10 +123,26 @@ class LabelTreeClassifier(base.BaseEstimator, base.ClassifierMixin):
         return self
 
     def predict(self, X):
-        return predict(X, self.tree_)
+        y_pred = np.empty(len(X), dtype=self.classes_.dtype)
+        predict(self.tree_, X, y_out=y_pred)
+        return y_pred
+
+    def predict_proba(self, X):
+        y_pred = np.zeros(len(X), dtype=np.dtype([(str(c), 'f') for c in self.classes_]))
+        predict_proba(self.tree_, X, y_out=y_pred)
+        return y_pred.view(('f', len(self.classes_)))
 
 
 def split_in_half(l: list):
+    """Split a list in half.
+
+    >>> split_in_half([1, 2, 3, 4])
+    ([1, 2], [3, 4])
+
+    >>> split_in_half([1, 2, 3])
+    ([1, 2], [3])
+
+    """
     cut = (len(l) + 1) // 2
     return l[:cut], l[cut:]
 
@@ -163,6 +172,15 @@ def set_splits(s, r):
 
 
 def pick(iterable, indexes):
+    """
+
+    >>> list(pick(['A', 'B', 'C', 'D'], [1, 2]))
+    ['B', 'C']
+
+    >>> list(pick(iter(['A', 'B', 'C', 'D']), [1, 2]))
+    ['B', 'C']
+
+    """
 
     indexes = sorted(indexes)
     iterable = enumerate(iterable)
@@ -202,6 +220,21 @@ def iter_trees(labels, k: int = None):
             when `k = None`, which is the default behaviour. If `k` is a `float`, then it is
             interpreted as the percentage of trees to sample.
 
+    >>> sum(1 for _ in iter_trees(range(1)))
+    1
+
+    >>> sum(1 for _ in iter_trees(range(2)))
+    1
+
+    >>> sum(1 for _ in iter_trees(range(3)))
+    3
+
+    >>> sum(1 for _ in iter_trees(range(4)))
+    15
+
+    >>> sum(1 for _ in iter_trees(range(5)))
+    105
+
     """
 
     if k is not None:
@@ -224,7 +257,7 @@ def iter_trees(labels, k: int = None):
                 yield Branch(l_branch, r_branch)
 
 
-def train(X, y, model, tree):
+def train(tree, model, X, y):
     """Train a binary tree of models.
 
     This function navigates through the tree in a depth-first manner. Each leaf returns
@@ -232,31 +265,56 @@ def train(X, y, model, tree):
     at each branch. The training data at each branch is determined by the union of the masks
     from the left and right children.
 
+    Note that the assumption is that a True label corresponds to going left down the tree.
+
     """
 
     if not isinstance(tree, Branch):
         return y == tree
 
-    mask = train(X, y, model, tree.left)
-    rmask = train(X, y, model, tree.right)
-    mask |= rmask
+    lmask = train(tree.left, model, X, y)
+    rmask = train(tree.right, model, X, y)
+    mask = lmask | rmask
 
     # TODO: the following could be handled by a pool of workers
-    tree.model = base.clone(model).fit(X[mask], rmask[mask])
+    if tree.model is None:
+        tree.model = base.clone(model).fit(X[mask], lmask[mask])
 
     return mask
 
 
-def predict(X, tree):
+def predict(tree, X, y_out, y_idx=None):
+
+    if y_idx is None:
+        y_idx = np.arange(len(y_out))
+
+    if len(X) == 0:
+        return
+
+    # If we're in a leaf, we set the appropriate y rows to the value of the leaf
+    if not isinstance(tree, Branch):
+        y_out[y_idx] = tree
+        return
+
+    # Go left and right according to the branch's model output for each row
+    mask = tree.model.predict(X)
+    predict(tree.left, X[mask], y_out, y_idx[mask])
+    predict(tree.right, X[~mask], y_out, y_idx[~mask])
+
+
+def predict_proba(tree, X, y_out, p_parent=None):
+
+    if p_parent is None:
+        p_parent = np.ones(len(y_out), dtype=float)
+
+    if len(X) == 0:
+        return
 
     if not isinstance(tree, Branch):
-        return np.full(X.shape[0], fill_value=tree)
+        y_out[str(tree)] = p_parent
+        return
 
-    mask = tree.model.predict(X)
+    p_pred = tree.model.predict_proba(X)
 
-    y_left = predict(X[~mask], tree.left)
-    y_pred = np.empty(mask.shape[0], dtype=y_left.dtype)
-    y_pred[~mask] = y_left
-    y_pred[mask] = predict(X[mask], tree.right)
-
-    return y_pred
+    predict_proba(tree.left, X, y_out, p_parent * p_pred[:, 1])
+    predict_proba(tree.right, X, y_out, p_parent * p_pred[:, 0])

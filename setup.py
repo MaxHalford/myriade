@@ -8,7 +8,7 @@ setuptools.setup(
     version='0.0.1',
     author='Max Halford',
     author_email='maxhalford25@gmail.com',
-    description='Multiclass classification with many classes',
+    description='Multi-class and multi-label classification with many classes',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/MaxHalford/myriad',
