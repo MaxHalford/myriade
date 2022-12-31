@@ -1,5 +1,6 @@
 import copy
 import itertools
+import random
 import warnings
 
 import numpy as np
@@ -151,7 +152,7 @@ def split_in_half(l: list, shuffle=False):
 def make_balanced_tree(labels: list, shuffle=False):
     if len(labels) == 1:
         return labels[0]
-    l, r = split_in_half(labels)
+    l, r = split_in_half(labels, shuffle=shuffle)
     return Branch(
         make_balanced_tree(l, shuffle=shuffle), make_balanced_tree(r, shuffle=shuffle)
     )
@@ -288,16 +289,13 @@ def train(tree, model, X, y):
     return mask
 
 
-def predict(tree, X, y_out=None, y_idx=None):
-
-    if y_out is None:
-        y_out = np.empty(len(X), dtype=int)
+def predict(tree, X, y_out, y_idx=None):
 
     if y_idx is None:
         y_idx = np.arange(len(y_out))
 
     if len(X) == 0:
-        return
+        return y_out
 
     # If we're in a leaf, we set the appropriate y rows to the value of the leaf
     if isinstance(tree, str):
