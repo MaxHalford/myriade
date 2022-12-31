@@ -7,15 +7,10 @@ from scipy import special
 from sklearn import base
 
 
-__all__ = [
-    'Branch',
-    'iter_trees',
-    'LabelTreeClassifier'
-]
+__all__ = ["Branch", "iter_trees", "LabelTreeClassifier"]
 
 
 class Branch:
-
     def __init__(self, left, right, model=None):
         self.left = left
         self.right = right
@@ -26,14 +21,14 @@ class Branch:
 
         def _to_html(el):
             if isinstance(el, Branch):
-                return f'''
+                return f"""
                 <details open>
                     <summary></summary>
                     {_to_html(el.left)}
                     {_to_html(el.right)}
                 </details>
-                '''
-            return f'<div>{el}</div>'
+                """
+            return f"<div>{el}</div>"
 
         css = '<style type="text/css">details > *:not(summary){margin-left: 1.5em;}</style>'
         return _to_html(self) + css
@@ -65,10 +60,11 @@ class Branch:
         """
 
         import graphviz
+
         G = graphviz.Graph(**kwargs)
 
         for i, j, _, child, _ in self._iter_edges():
-            G.node(str(i), shape='point')
+            G.node(str(i), shape="point")
             if not isinstance(child, Branch):
                 G.node(str(j), label=str(child))
             G.edge(str(i), str(j))
@@ -77,15 +73,14 @@ class Branch:
 
     def _repr_html_(self):
         """Render output in a Jupyter notebook."""
-        from IPython.core.display import display, SVG
-        svg = self.to_graphviz(format='svg').pipe().decode('utf-8')
-        return display(SVG(svg))
+
+        return self.to_graphviz(format="svg").pipe().decode("utf-8")
 
 
 class LabelTreeClassifier(base.BaseEstimator, base.ClassifierMixin):
-
-    def __init__(self, classifier: base.ClassifierMixin, prior_tree: Branch = None,
-                 n_rounds=1):
+    def __init__(
+        self, classifier: base.ClassifierMixin, prior_tree: Branch = None, n_rounds=1
+    ):
         self.classifier = classifier
         self.prior_tree = prior_tree
         self.n_rounds = n_rounds
@@ -105,18 +100,20 @@ class LabelTreeClassifier(base.BaseEstimator, base.ClassifierMixin):
         # mask necessarily contains only Trues if the tree contains each label, therefore we
         # know that labels are missing if mask contains Falses
         if not np.all(mask):
-            warnings.warn('Not all classes were specified in the prior tree. This might ' +
-                          'hinder performance.')
+            warnings.warn(
+                "Not all classes were specified in the prior tree. This might "
+                + "hinder performance."
+            )
 
         # TODO: use self.n_rounds
 
         # Make predictions and establish the confusion matrix
-        #y_pred = predict(X, tree)
-        #cm = metrics.confusion_matrix(y, y_pred, labels=self.classes_)
+        # y_pred = predict(X, tree)
+        # cm = metrics.confusion_matrix(y, y_pred, labels=self.classes_)
 
         # Build smarter tree
-        #self.tree_ = build_smart_tree(self.classes_, cm)
-        #train(X, y, self.tree_, self.classifier)
+        # self.tree_ = build_smart_tree(self.classes_, cm)
+        # train(X, y, self.tree_, self.classifier)
 
         self.tree_ = tree
 
@@ -128,12 +125,14 @@ class LabelTreeClassifier(base.BaseEstimator, base.ClassifierMixin):
         return y_pred
 
     def predict_proba(self, X):
-        y_pred = np.zeros(len(X), dtype=np.dtype([(str(c), 'f') for c in self.classes_]))
+        y_pred = np.zeros(
+            len(X), dtype=np.dtype([(str(c), "f") for c in self.classes_])
+        )
         predict_proba(self.tree_, X, y_out=y_pred)
-        return y_pred.view(('f', len(self.classes_)))
+        return y_pred.view(("f", len(self.classes_)))
 
 
-def split_in_half(l: list):
+def split_in_half(l: list, shuffle=False):
     """Split a list in half.
 
     >>> split_in_half([1, 2, 3, 4])
@@ -143,21 +142,23 @@ def split_in_half(l: list):
     ([1, 2], [3])
 
     """
+    if shuffle:
+        random.shuffle(l)
     cut = (len(l) + 1) // 2
     return l[:cut], l[cut:]
 
 
-def make_balanced_tree(labels: list):
+def make_balanced_tree(labels: list, shuffle=False):
     if len(labels) == 1:
         return labels[0]
     l, r = split_in_half(labels)
-    return Branch(make_balanced_tree(l), make_balanced_tree(r))
+    return Branch(
+        make_balanced_tree(l, shuffle=shuffle), make_balanced_tree(r, shuffle=shuffle)
+    )
 
 
 def set_splits(s, r):
-    """Iterates over all the binary splits of size `r`.
-
-    """
+    """Iterates over all the binary splits of size `r`."""
 
     s = set(s)
     combos = map(set, itertools.combinations(s, r))
@@ -238,11 +239,13 @@ def iter_trees(labels, k: int = None):
     """
 
     if k is not None:
-        n = special.factorial2(2 * (len(labels) - 1) - 1, exact=True)  # number of possible trees
+        n = special.factorial2(
+            2 * (len(labels) - 1) - 1, exact=True
+        )  # number of possible trees
         if isinstance(k, float):
             k = int(k * n)
         if k > n:
-            raise ValueError(f'k={k} is higher than the total number of trees ({n})')
+            raise ValueError(f"k={k} is higher than the total number of trees ({n})")
         choices = set(np.random.choice(n, size=k, replace=False))
         yield from pick(iter_trees(labels, k=None), choices)
         return
@@ -253,7 +256,9 @@ def iter_trees(labels, k: int = None):
 
     for l_size in range((len(labels) + 1) // 2, len(labels)):
         for l_labels, r_labels in set_splits(labels, l_size):
-            for l_branch, r_branch in itertools.product(iter_trees(l_labels), iter_trees(r_labels)):
+            for l_branch, r_branch in itertools.product(
+                iter_trees(l_labels), iter_trees(r_labels)
+            ):
                 yield Branch(l_branch, r_branch)
 
 
@@ -269,7 +274,7 @@ def train(tree, model, X, y):
 
     """
 
-    if not isinstance(tree, Branch):
+    if isinstance(tree, str):
         return y == tree
 
     lmask = train(tree.left, model, X, y)
@@ -283,7 +288,10 @@ def train(tree, model, X, y):
     return mask
 
 
-def predict(tree, X, y_out, y_idx=None):
+def predict(tree, X, y_out=None, y_idx=None):
+
+    if y_out is None:
+        y_out = np.empty(len(X), dtype=int)
 
     if y_idx is None:
         y_idx = np.arange(len(y_out))
@@ -292,7 +300,7 @@ def predict(tree, X, y_out, y_idx=None):
         return
 
     # If we're in a leaf, we set the appropriate y rows to the value of the leaf
-    if not isinstance(tree, Branch):
+    if isinstance(tree, str):
         y_out[y_idx] = tree
         return
 
