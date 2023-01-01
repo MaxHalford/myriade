@@ -1,16 +1,14 @@
 import numpy as np
 
-import myriad
+import myriade
 
 
 def test_predict():
-
     A = 0
     B = 1
     C = 2
 
     class Dummy:
-
         def __init__(self, label):
             self.label = label
 
@@ -20,9 +18,9 @@ def test_predict():
     #  / \
     # A  /\
     #   B  C
-    tree = myriad.LabelTreeClassifier(
+    tree = myriade.multiclass.ManualHierarchyClassifier(
         classifier=None,
-        prior_tree=myriad.Branch(A, myriad.Branch(B, C, Dummy(B)), Dummy(A))
+        tree=myriade.Branch(A, myriade.Branch(B, C, Dummy(B)), Dummy(A)),
     )
 
     x = np.array([A, B, C, A, B, C])
