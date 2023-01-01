@@ -1,24 +1,56 @@
 import random
 import myriade
+import numpy as np
+from sklearn import utils
 
 
-class RandomHierarchyClassifier(myriade.base.HierarchyClassifier):
-    """Random hierarchy classifier.
+class RandomBalancedHierarchyClassifier(myriade.base.HierarchyClassifier):
+    """Random balanced hierarchy classifier.
 
     For those who are feeling lucky.
 
+    Examples
+    --------
+
+    >>> import myriade
+    >>> from sklearn import datasets
+    >>> from sklearn import linear_model
+    >>> from sklearn import model_selection
+    >>> from sklearn import pipeline
+    >>> from sklearn import preprocessing
+
+    >>> X, y = datasets.load_digits(return_X_y=True)
+
+    >>> X_train, X_test, y_train, y_test = model_selection.train_test_split(
+    ...     X, y, test_size=0.4, random_state=42
+    ... )
+
+    >>> model = pipeline.make_pipeline(
+    ...     preprocessing.StandardScaler(),
+    ...     myriade.multiclass.RandomBalancedHierarchyClassifier(
+    ...         classifier=linear_model.LogisticRegression(),
+    ...         seed=42
+    ...     )
+    ... )
+    >>> model = model.fit(X_train, y_train)
+    >>> print(f"{model.score(X_test, y_test):.2%}")
+    89.43%
+
     """
 
-    def __init__(self, random_state=None):
-        self.random_state = random_state
+    def __init__(self, classifier, seed=None):
+        super().__init__(classifier)
+        self.seed = seed
+        self.rng = np.random.default_rng(seed)
 
-    def fit(self, X, y):
+    def _build_tree(self, X, y):
         self.classes_ = np.unique(y)
-        self.tree_ = make_balanced_tree(labels=self.classes_)
-        return self
+        labels = self.classes_.copy()
+        self.rng.shuffle(labels)
+        return make_balanced_tree(labels=labels)
 
 
-def split_in_half(l: list, shuffle=False):
+def split_in_half(l: list):
     """Split a list in half.
 
     >>> split_in_half([1, 2, 3, 4])
@@ -28,16 +60,12 @@ def split_in_half(l: list, shuffle=False):
     ([1, 2], [3])
 
     """
-    if shuffle:
-        random.shuffle(l)
     cut = (len(l) + 1) // 2
     return l[:cut], l[cut:]
 
 
-def make_balanced_tree(labels: list, shuffle=False):
+def make_balanced_tree(labels: list):
     if len(labels) == 1:
         return labels[0]
-    l, r = split_in_half(labels, shuffle=shuffle)
-    return Branch(
-        make_balanced_tree(l, shuffle=shuffle), make_balanced_tree(r, shuffle=shuffle)
-    )
+    l, r = split_in_half(labels)
+    return myriade.Branch(make_balanced_tree(l), make_balanced_tree(r))
