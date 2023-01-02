@@ -17,7 +17,7 @@ Hierarchical extreme multiclass and multi-label classification.
 
 ## Motivation
 
-Extreme multiclass classification problems are situations where the number of labels is extremely large. Typically, more than tens of thousands of labels. These problems can also be multi-label: a sample can be assigned more than one label. Usual methods don't scale well in these cases.
+Extreme multiclass classification problems are situations where the number of labels is extremely large. Typically, in the order of tens of thousands of labels. These problems can also be multi-label: a sample can be assigned more than one label. Usual methods don't scale well in these cases.
 
 This Python package provides methods to address multiclass classification. It takes a hierarchical approach. The idea being to organize labels into a binary tree, and train a binary classifier at each node.
 
@@ -114,7 +114,7 @@ It's also possible to search the spaces of all possible hierarchies, and pick th
 </div>
 </br>
 
-The only downside to this method is that the amount of possible hierarchies grows extremely large with the number of labels. In fact, this amount corresponds to sequence [A001147](https://oeis.org/A001147) in the Online Encyclopedia of Integer Sequences (OEIS):
+The only downside to this method is that the amount of possible hierarchies grows extremely large with the number of labels. In fact, if I'm not mistaken, this amount corresponds to sequence [A001147](https://oeis.org/A001147) in the Online Encyclopedia of Integer Sequences (OEIS):
 
 | Number of labels | Number of possible hierarchies |
 |------------------|--------------------------------|
@@ -122,11 +122,14 @@ The only downside to this method is that the amount of possible hierarchies grow
 | 2                | 1                              |
 | 3                | 3                              |
 | 4                | 15                             |
-| 5                | 945                            |
-| 6                | 10395                          |
-| 7                | 135135                         |
+| 5                | 105                            |
+| 6                | 945                            |
+| 7                | 10,395                         |
+| 8                | 135,135                        |
+| 9                | 2,027,025                      |
+| 10               | 34,459,425                     |
 
-This method is therefore only useful for benchmarking purposes. Indeed, for a small number of label, it's useful to know if a hierarchy is optimal in some sense.
+This method is therefore only useful for benchmarking purposes. Indeed, for a small number of labels, it's useful to know if a hierarchy is optimal in some sense.
 
 #### Manual hierarchy
 
