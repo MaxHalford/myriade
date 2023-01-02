@@ -70,15 +70,29 @@ You can also specify a hierarchy manually via the `myriade.Branch` class.
 
 ```py
 >>> b = myriade.Branch
+>>> tree = b(
+...     b(0, 1),
+...     b(
+...         2,
+...         b(3, 4)
+...     )
+... )
+
 >>> model = myriade.multiclass.ManualHierarchyClassifier(
 ...     classifier=linear_model.LogisticRegression(),
-...     tree=b(b(0, 1), b(2, b(3, 4)))
+...     tree=tree
 ... )
 >>> model = model.fit(X_train, y_train)
 >>> print(f"{model.score(X_test, y_test):.2%}")
 94.24%
 
 ```
+
+</br>
+<div align="center">
+    <img src="img/manual.svg">
+</div>
+</br>
 
 #### Random balanced
 
@@ -167,12 +181,6 @@ This method is therefore only useful for benchmarking purposes. Indeed, for a sm
 >>> path = dot.render('manual', directory='img', format='svg', cleanup=True)
 
 ```
-
-</br>
-<div align="center">
-    <img src="img/manual.svg">
-</div>
-</br>
 
 ## Multi-label
 
