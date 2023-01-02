@@ -2,7 +2,14 @@
 
 Hierarchical extreme multiclass and multi-label classification.
 
+</br>
+<div align="center">
+    <img src="img/night-sky.jpg">
+</div>
+</br>
+
 - [Motivation](#motivation)
+- [Installation](#installation)
 - [Usage](#usage)
   - [Multiclass](#multiclass)
     - [Dataset](#dataset)
@@ -20,6 +27,12 @@ Hierarchical extreme multiclass and multi-label classification.
 Extreme multiclass classification problems are situations where the number of labels is extremely large. Typically, in the order of tens of thousands of labels. These problems can also be multi-label: a sample can be assigned more than one label. Usual methods don't scale well in these cases.
 
 This Python package provides methods to address multiclass classification. It takes a hierarchical approach. The idea being to organize labels into a binary tree, and train a binary classifier at each node.
+
+## Installation
+
+```py
+pip install myriade
+```
 
 ## Usage
 
