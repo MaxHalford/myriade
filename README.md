@@ -4,12 +4,12 @@ Hierarchical extreme multiclass and multi-label classification.
 
 - [Usage](#usage)
   - [Multiclass](#multiclass)
+    - [Dataset](#dataset)
     - [Random balanced hierarchy](#random-balanced-hierarchy)
     - [Optimal hierarchy](#optimal-hierarchy)
     - [Manual hierarchy](#manual-hierarchy)
-  - [Visualization](#visualization)
   - [Multi-label](#multi-label)
-- [Datasets](#datasets)
+  - [Datasets](#datasets)
 - [Benchmarks](#benchmarks)
 - [Contributing](#contributing)
 - [License](#license)
@@ -18,6 +18,10 @@ Hierarchical extreme multiclass and multi-label classification.
 ## Usage
 
 ### Multiclass
+
+#### Dataset
+
+A multiclass classification dataset contains a 2D matrix/dataframe of features, and a 1D array/series of labels.
 
 For these examples, we'll load the first 5 digits of the UCI ML hand-written digits [dataset](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_digits.html).
 
@@ -43,6 +47,8 @@ For these examples, we'll load the first 5 digits of the UCI ML hand-written dig
 
 #### Random balanced hierarchy
 
+
+
 ```py
 >>> from sklearn import linear_model
 
@@ -56,6 +62,22 @@ For these examples, we'll load the first 5 digits of the UCI ML hand-written dig
 
 ```
 
+You can use the `to_graphviz` method of a model's `tree_` attribute to obtain a [`graphviz.Digraph`](https://graphviz.readthedocs.io/en/stable/api.html#graphviz.Digraph) representation.
+
+```py
+>>> dot = model.tree_.to_graphviz()
+>>> path = dot.render('random', directory='img', format='svg', cleanup=True)
+
+```
+
+</br>
+<div align="center">
+    <img src="img/random.svg">
+</div>
+</br>
+
+☝️ Note that the [`graphviz` library](https://graphviz.readthedocs.io/en/stable/) is not installed by default because it requires a platform dependent binary. Therefore, you have to [install it](https://graphviz.readthedocs.io/en/stable/#installation) by yourself.
+
 #### Optimal hierarchy
 
 ```py
@@ -67,6 +89,18 @@ For these examples, we'll load the first 5 digits of the UCI ML hand-written dig
 96.90%
 
 ```
+
+```py
+>>> dot = model.tree_.to_graphviz()
+>>> path = dot.render('optimal', directory='img', format='svg', cleanup=True)
+
+```
+
+</br>
+<div align="center">
+    <img src="img/optimal.svg">
+</div>
+</br>
 
 #### Manual hierarchy
 
@@ -82,10 +116,6 @@ For these examples, we'll load the first 5 digits of the UCI ML hand-written dig
 
 ```
 
-### Visualization
-
-You can use the `to_graphviz` method of a model's `tree_` attribute to obtain a [`graphviz.Digraph`](https://graphviz.readthedocs.io/en/stable/api.html#graphviz.Digraph) representation.
-
 ```py
 >>> dot = model.tree_.to_graphviz()
 >>> path = dot.render('manual', directory='img', format='svg', cleanup=True)
@@ -98,13 +128,11 @@ You can use the `to_graphviz` method of a model's `tree_` attribute to obtain a 
 </div>
 </br>
 
-Note that the [`graphviz` library](https://graphviz.readthedocs.io/en/stable/) is not installed by default because it requires a platform dependent binary. Therefore, you have to [install it](https://graphviz.readthedocs.io/en/stable/#installation) by yourself.
-
 ### Multi-label
 
 🏗️
 
-## Datasets
+### Datasets
 
 | Name | Function    | Size     | Samples | Features | Labels     | Multi-label    | Labels/sample |
 |:----:|:-----------:|:---------|:-------:|:--------:|:----------:|:--------------:|:-------------:|
