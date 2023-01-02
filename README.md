@@ -8,16 +8,15 @@ Hierarchical extreme multiclass and multi-label classification.
 
 - [Motivation](#motivation)
 - [Installation](#installation)
-- [User guide](#user-guide)
-  - [Multiclass](#multiclass)
-    - [Dataset](#dataset)
-    - [Baselines](#baselines)
-      - [Manual](#manual)
-      - [Random balanced](#random-balanced)
-      - [Optimal hierarchy](#optimal-hierarchy)
-    - [Balanced](#balanced)
-  - [Multi-label](#multi-label)
-  - [Datasets](#datasets)
+- [Multiclass](#multiclass)
+  - [Dataset](#dataset)
+  - [Baselines](#baselines)
+    - [Manual](#manual)
+    - [Random balanced](#random-balanced)
+    - [Optimal hierarchy](#optimal-hierarchy)
+  - [Balanced](#balanced)
+- [Multi-label](#multi-label)
+- [Datasets](#datasets)
 - [Benchmarks](#benchmarks)
 - [Contributing](#contributing)
 - [License](#license)
@@ -34,11 +33,10 @@ This Python package provides methods to address multiclass classification. It ta
 pip install myriade
 ```
 
-## User guide
 
-### Multiclass
+## Multiclass
 
-#### Dataset
+### Dataset
 
 A multiclass classification dataset contains a 2D matrix/dataframe of features, and a 1D array/series of labels.
 
@@ -64,9 +62,9 @@ For these examples, we'll load the first 5 digits of the UCI ML hand-written dig
 
 ```
 
-#### Baselines
+### Baselines
 
-##### Manual
+#### Manual
 
 You can also specify a hierarchy manually via the `myriade.Branch` class.
 
@@ -82,7 +80,7 @@ You can also specify a hierarchy manually via the `myriade.Branch` class.
 
 ```
 
-##### Random balanced
+#### Random balanced
 
 The most basic strategy is to organize labels into a random hierarchy. The `RandomBalancedHierarchyClassifier` does just this, by creating a balanced tree. The randomness is controlled with the `seed` parameter.
 
@@ -115,7 +113,7 @@ You can use the `to_graphviz` method of a model's `tree_` attribute to obtain a 
 
 ☝️ Note that the [`graphviz` library](https://graphviz.readthedocs.io/en/stable/) is not installed by default because it requires a platform dependent binary. Therefore, you have to [install it](https://graphviz.readthedocs.io/en/stable/#installation) by yourself.
 
-##### Optimal hierarchy
+#### Optimal hierarchy
 
 It's also possible to search the spaces of all possible hierarchies, and pick the best one. Hierarchies are compared with each other by estimating their performance with cross-validation.
 
@@ -162,7 +160,7 @@ The only downside to this method is that the amount of possible hierarchies grow
 
 This method is therefore only useful for benchmarking purposes. Indeed, for a small number of labels, it's useful to know if a hierarchy is optimal in some sense.
 
-#### Balanced
+### Balanced
 
 ```py
 >>> dot = model.tree_.to_graphviz()
@@ -176,11 +174,11 @@ This method is therefore only useful for benchmarking purposes. Indeed, for a sm
 </div>
 </br>
 
-### Multi-label
+## Multi-label
 
 🏗️
 
-### Datasets
+## Datasets
 
 | Name | Function    | Size     | Samples | Features | Labels     | Multi-label    | Labels/sample |
 |:----:|:-----------:|:---------|:-------:|:--------:|:----------:|:--------------:|:-------------:|
