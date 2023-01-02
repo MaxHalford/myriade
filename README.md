@@ -94,7 +94,7 @@ You can use the `to_graphviz` method of a model's `tree_` attribute to obtain a 
 
 </br>
 <div align="center">
-    <img src="figures/manual.svg">
+    <img src="img/manual.svg">
 </div>
 </br>
 
