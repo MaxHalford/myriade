@@ -77,7 +77,17 @@ You can also specify a hierarchy manually via the `myriade.Branch` class.
 ...         b(3, 4)
 ...     )
 ... )
+>>> dot = tree.to_graphviz()
+>>> path = dot.render('manual', directory='img', format='svg', cleanup=True)
+```
 
+</br>
+<div align="center">
+    <img src="img/manual.svg">
+</div>
+</br>
+
+```py
 >>> model = myriade.multiclass.ManualHierarchyClassifier(
 ...     classifier=linear_model.LogisticRegression(),
 ...     tree=tree
@@ -87,12 +97,6 @@ You can also specify a hierarchy manually via the `myriade.Branch` class.
 94.24%
 
 ```
-
-</br>
-<div align="center">
-    <img src="img/manual.svg">
-</div>
-</br>
 
 #### Random balanced
 
@@ -175,12 +179,6 @@ The only downside to this method is that the amount of possible hierarchies grow
 This method is therefore only useful for benchmarking purposes. Indeed, for a small number of labels, it's useful to know if a hierarchy is optimal in some sense.
 
 ### Balanced
-
-```py
->>> dot = model.tree_.to_graphviz()
->>> path = dot.render('manual', directory='img', format='svg', cleanup=True)
-
-```
 
 ## Multi-label
 
