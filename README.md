@@ -3,7 +3,7 @@
 Hierarchical extreme multiclass and multi-label classification.
 
 <div align="center">
-    <img src="img/night-sky.jpg" width="30%" align="right">
+    <img src="img/night-sky.jpg" width="42%" align="right">
 </div>
 
 - [Motivation](#motivation)
