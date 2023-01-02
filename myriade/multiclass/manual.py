@@ -4,7 +4,12 @@ import myriade
 class ManualHierarchyClassifier(myriade.base.HierarchyClassifier):
     """Manual hierarchy classifier.
 
-    For the lucky ones who already have a hierarchy.
+    Parameters
+    ----------
+    classifier
+        The base classifier.
+    tree
+        The tree.
 
     """
 

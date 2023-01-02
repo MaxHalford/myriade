@@ -1,8 +1,108 @@
-# myriad
+<h1>myriade</h1>
 
-Multiclass classification with tens of thousands of classes
+Hierarchical extreme multiclass and multi-label classification.
+
+- [Usage](#usage)
+  - [Multiclass](#multiclass)
+    - [Random balanced hierarchy](#random-balanced-hierarchy)
+    - [Optimal hierarchy](#optimal-hierarchy)
+    - [Manual hierarchy](#manual-hierarchy)
+  - [Visualization](#visualization)
+  - [Multi-label](#multi-label)
+- [Datasets](#datasets)
+- [Benchmarks](#benchmarks)
+- [Contributing](#contributing)
+- [License](#license)
+
 
 ## Usage
+
+### Multiclass
+
+For these examples, we'll load the first 5 digits of the UCI ML hand-written digits [dataset](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_digits.html).
+
+```py
+>>> import myriade
+>>> from sklearn import datasets
+>>> from sklearn import model_selection
+>>> from sklearn import preprocessing
+
+>>> X, y = datasets.load_digits(n_class=5, return_X_y=True)
+>>> X = preprocessing.scale(X)
+>>> len(X)
+901
+
+>>> sorted(set(y))
+[0, 1, 2, 3, 4]
+
+>>> X_train, X_test, y_train, y_test = model_selection.train_test_split(
+...     X, y, test_size=0.5, random_state=42
+... )
+
+```
+
+#### Random balanced hierarchy
+
+```py
+>>> from sklearn import linear_model
+
+>>> model = myriade.multiclass.RandomBalancedHierarchyClassifier(
+...     classifier=linear_model.LogisticRegression(),
+...     seed=42
+... )
+>>> model = model.fit(X_train, y_train)
+>>> print(f"{model.score(X_test, y_test):.2%}")
+94.01%
+
+```
+
+#### Optimal hierarchy
+
+```py
+>>> model = myriade.multiclass.OptimalHierarchyClassifier(
+...     classifier=linear_model.LogisticRegression()
+... )
+>>> model = model.fit(X_train, y_train)
+>>> print(f"{model.score(X_test, y_test):.2%}")
+96.90%
+
+```
+
+#### Manual hierarchy
+
+```py
+>>> b = myriade.Branch
+>>> model = myriade.multiclass.ManualHierarchyClassifier(
+...     classifier=linear_model.LogisticRegression(),
+...     tree=b(b(0, 1), b(2, b(3, 4)))
+... )
+>>> model = model.fit(X_train, y_train)
+>>> print(f"{model.score(X_test, y_test):.2%}")
+94.24%
+
+```
+
+### Visualization
+
+You can use the `to_graphviz` method of a model's `tree_` attribute to obtain a [`graphviz.Digraph`](https://graphviz.readthedocs.io/en/stable/api.html#graphviz.Digraph) representation.
+
+```py
+>>> dot = model.tree_.to_graphviz()
+>>> path = dot.render('manual', directory='img', format='svg', cleanup=True)
+
+```
+
+</br>
+<div align="center">
+    <img src="figures/manual.svg">
+</div>
+</br>
+
+Note that the [`graphviz` library](https://graphviz.readthedocs.io/en/stable/) is not installed by default because it requires a platform dependent binary. Therefore, you have to [install it](https://graphviz.readthedocs.io/en/stable/#installation) by yourself.
+
+### Multi-label
+
+🏗️
 
 ## Datasets
 
@@ -14,25 +114,31 @@ Multiclass classification with tens of thousands of classes
 
 Each `load_*` function returns two arrays which contain the features and the target classes, respectively. In the multi-label case, the target array is 2D. The arrays are sparse when applicable.
 
-```py
->>> from myriad import datasets
-
->>> X, y = datasets.load_dmoz()
->>> X
-
->>> y
-
-```
-
-The first time you call a `load_*` function, the data will be downloaded and saved into a `.svm` file that adheres to the [LIBSVM format convention](https://www.csie.ntu.edu.tw/~cjlin/libsvm/faq.html#/Q03:_Data_preparation). The loaders will restart from scratch if you interrupt them during their work.
+The first time you call a `load_*` function, the data will be downloaded and saved into a `.svm` file that adheres to the [LIBSVM format convention](https://www.csie.ntu.edu.tw/~cjlin/libsvm/faq.html#/Q03:_Data_preparation). The loaders will restart from scratch if you interrupt them during their work. You can see where the datasets are stored by calling `myriade.datasets.get_data_home`.
 
 All of the datasets are loaded in memory with the [`svmloader`](https://github.com/yoch/svmloader/) library. The latter is much faster than the [`load_svmlight_file`](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_svmlight_file.html) function from scikit-learn. However, when working repeatedly on the same dataset, it is recommended to wrap the dataset loader with [`joblib.Memory.cache`](https://joblib.readthedocs.io/en/latest/memory.html) to store a memmapped backup of the results of the first call. This enables near instantaneous loading for subsequent calls.
 
-You can see where the datasets are stored as so:
+## Benchmarks
 
-```py
->>> datasets.get_data_home()
+🏗️
 
+## Contributing
+
+```sh
+# Download and navigate to the source code
+git clone https://github.com/MaxHalford/myriade
+cd myriade
+
+# Install poetry
+curl -sSL https://install.python-poetry.org | POETRY_PREVIEW=1 python3 -
+
+# Install in development mode
+poetry install --dev
+
+# Run tests
+pytest
 ```
 
-## Benchmarks
+## License
+
+This project is free and open-source software licensed under the [MIT license](LICENSE).

@@ -1,15 +1,51 @@
 import itertools
+import operator
 import numpy as np
 from scipy import special
+from sklearn import metrics, model_selection
 import myriade
 
 
 class OptimalHierarchyClassifier(myriade.base.HierarchyClassifier):
     """Optimal hierarchy classifier.
 
-    For those who have time on their hands.
+    Parameters
+    ----------
+    classifier
+        The base classifier.
+    cv
+        The cross-validation strategy.
+    scorer
+        The scorer.
 
     """
+
+    def __init__(self, classifier, cv=None, scorer=None):
+        super().__init__(classifier)
+        self.cv = cv or model_selection.KFold(n_splits=2)
+        self.scorer = scorer or metrics.make_scorer(metrics.accuracy_score)
+
+    def _score_tree(self, X, y, tree):
+        """Score a tree by cross-validation."""
+
+        cv_results = model_selection.cross_validate(
+            self.classifier, X, y, cv=self.cv, scoring=self.scorer
+        )
+
+        return np.mean(cv_results["test_score"])
+
+    def _build_tree(self, X, y):
+        best_score = 0
+        best_tree = None
+        op = operator.gt if self.scorer._sign else operator.lt
+
+        for tree in iter_trees(set(y)):
+            score = self._score_tree(X, y, tree)
+            if op(score, best_score):
+                best_score = score
+                best_tree = tree
+
+        return best_tree
 
 
 def set_splits(s, r):
@@ -50,7 +86,7 @@ def pick(iterable, indexes):
 
 
 def iter_trees(labels, k: int = None):
-    r"""Iterate over every possible labeled binary trees.
+    """Iterate over every possible labeled binary trees.
 
     As an example, for n = 3, the possible trees are:
 
@@ -69,11 +105,14 @@ def iter_trees(labels, k: int = None):
     The number of results is equal to the double factorial of odd numbers, which corresponds
     to sequence A001147 on the Online Encyclopedia of Integer Sequences (OEIS).
 
-    Parameters:
-        labels: A set of labels.
-        k: Determines the number of trees to sample at random. All the trees are returned
-            when `k = None`, which is the default behaviour. If `k` is a `float`, then it is
-            interpreted as the percentage of trees to sample.
+    Parameters
+    ----------
+    labels
+        A set of labels.
+    k
+        Determines the number of trees to sample at random. All the trees are returned
+        when `k = None`, which is the default behaviour. If `k` is a `float`, then it is
+        interpreted as the percentage of trees to sample.
 
     >>> sum(1 for _ in iter_trees(range(1)))
     1
