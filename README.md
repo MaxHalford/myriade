@@ -2,11 +2,9 @@
 
 Hierarchical extreme multiclass and multi-label classification.
 
-</br>
 <div align="center">
-    <img src="img/night-sky.jpg">
+    <img src="img/night-sky.jpg" width="30%" align="right">
 </div>
-</br>
 
 - [Motivation](#motivation)
 - [Installation](#installation)
