@@ -2,6 +2,7 @@
 
 Hierarchical extreme multiclass and multi-label classification.
 
+- [Motivation](#motivation)
 - [Usage](#usage)
   - [Multiclass](#multiclass)
     - [Dataset](#dataset)
@@ -14,6 +15,11 @@ Hierarchical extreme multiclass and multi-label classification.
 - [Contributing](#contributing)
 - [License](#license)
 
+## Motivation
+
+Extreme multiclass classification problems are situations where the number of labels is extremely large. Typically, more than tens of thousands of labels. These problems can also be multi-label: a sample can be assigned more than one label. Usual methods don't scale well in these cases.
+
+This Python package provides methods to address multiclass classification. It takes a hierarchical approach. The idea being to organize labels into a binary tree, and train a binary classifier at each node.
 
 ## Usage
 
@@ -47,7 +53,7 @@ For these examples, we'll load the first 5 digits of the UCI ML hand-written dig
 
 #### Random balanced hierarchy
 
-
+The most basic strategy is to organize labels into a random hierarchy. The `RandomBalancedHierarchyClassifier` does just this, by creating a balanced tree. The randomness is controlled with the `seed` parameter.
 
 ```py
 >>> from sklearn import linear_model
@@ -80,9 +86,15 @@ You can use the `to_graphviz` method of a model's `tree_` attribute to obtain a 
 
 #### Optimal hierarchy
 
+It's also possible to search the spaces of all possible hierarchies, and pick the best one. Hierarchies are compared with each other by estimating their performance with cross-validation.
+
 ```py
+>>> from sklearn import metrics
+
 >>> model = myriade.multiclass.OptimalHierarchyClassifier(
-...     classifier=linear_model.LogisticRegression()
+...     classifier=linear_model.LogisticRegression(),
+...     cv=model_selection.KFold(2),
+...     scorer=metrics.make_scorer(metrics.accuracy_score),
 ... )
 >>> model = model.fit(X_train, y_train)
 >>> print(f"{model.score(X_test, y_test):.2%}")
@@ -102,7 +114,23 @@ You can use the `to_graphviz` method of a model's `tree_` attribute to obtain a 
 </div>
 </br>
 
+The only downside to this method is that the amount of possible hierarchies grows extremely large with the number of labels. In fact, this amount corresponds to sequence [A001147](https://oeis.org/A001147) in the Online Encyclopedia of Integer Sequences (OEIS):
+
+| Number of labels | Number of possible hierarchies |
+|------------------|--------------------------------|
+| 1                | 1                              |
+| 2                | 1                              |
+| 3                | 3                              |
+| 4                | 15                             |
+| 5                | 945                            |
+| 6                | 10395                          |
+| 7                | 135135                         |
+
+This method is therefore only useful for benchmarking purposes. Indeed, for a small number of label, it's useful to know if a hierarchy is optimal in some sense.
+
 #### Manual hierarchy
+
+You can also specify a hierarchy manually via the `myriade.Branch` class.
 
 ```py
 >>> b = myriade.Branch
