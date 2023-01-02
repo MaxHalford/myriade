@@ -3,7 +3,7 @@
 Hierarchical extreme multiclass and multi-label classification.
 
 <div align="center">
-    <img src="img/night-sky.jpg" width="42%" align="right">
+    <img src="img/night-sky.jpg" width="42%" align="right" alt="https://www.reddit.com/r/drawing/comments/84j0gn/night_sky_9x9in_pen/">
 </div>
 
 - [Motivation](#motivation)
