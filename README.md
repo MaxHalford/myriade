@@ -50,8 +50,8 @@ For these examples, we'll load the first 5 digits of the UCI ML hand-written dig
 
 >>> X, y = datasets.load_digits(n_class=5, return_X_y=True)
 >>> X = preprocessing.scale(X)
->>> len(X)
-901
+>>> X.shape
+(901, 64)
 
 >>> sorted(set(y))
 [0, 1, 2, 3, 4]
@@ -104,9 +104,14 @@ It's also possible to search the spaces of all possible hierarchies, and pick th
 ```py
 >>> from sklearn import metrics
 
+>>> cv = model_selection.ShuffleSplit(
+...     n_splits=1,
+...     train_size=0.5,
+...     random_state=42
+... )
 >>> model = myriade.multiclass.OptimalHierarchyClassifier(
 ...     classifier=linear_model.LogisticRegression(),
-...     cv=model_selection.KFold(2),
+...     cv=cv,
 ...     scorer=metrics.make_scorer(metrics.accuracy_score),
 ... )
 >>> model = model.fit(X_train, y_train)

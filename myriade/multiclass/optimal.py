@@ -31,11 +31,11 @@ class OptimalHierarchyClassifier(myriade.base.HierarchyClassifier):
         model = myriade.multiclass.ManualHierarchyClassifier(
             classifier=self.classifier, tree=tree
         )
-        cv_results = model_selection.cross_validate(
+        cv_scores = model_selection.cross_val_score(
             model, X, y, cv=self.cv, scoring=self.scorer
         )
 
-        return np.mean(cv_results["test_score"])
+        return np.mean(cv_scores)
 
     def _build_tree(self, X, y):
         best_score = 0
