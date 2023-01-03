@@ -11,9 +11,9 @@ Hierarchical extreme multiclass and multi-label classification.
 - [Multiclass](#multiclass)
   - [Dataset](#dataset)
   - [Baselines](#baselines)
-    - [Manual](#manual)
     - [Random balanced](#random-balanced)
-    - [Optimal hierarchy](#optimal-hierarchy)
+    - [Optimal](#optimal)
+    - [Manual](#manual)
   - [Balanced](#balanced)
 - [Multi-label](#multi-label)
 - [Datasets](#datasets)
@@ -64,40 +64,6 @@ For these examples, we'll load the first 5 digits of the UCI ML hand-written dig
 
 ### Baselines
 
-#### Manual
-
-You can also specify a hierarchy manually via the `myriade.Branch` class.
-
-```py
->>> b = myriade.Branch
->>> tree = b(
-...     b(0, 1),
-...     b(
-...         2,
-...         b(3, 4)
-...     )
-... )
->>> dot = tree.to_graphviz()
->>> path = dot.render('manual', directory='img', format='svg', cleanup=True)
-```
-
-</br>
-<div align="center">
-    <img src="img/manual.svg">
-</div>
-</br>
-
-```py
->>> model = myriade.multiclass.ManualHierarchyClassifier(
-...     classifier=linear_model.LogisticRegression(),
-...     tree=tree
-... )
->>> model = model.fit(X_train, y_train)
->>> print(f"{model.score(X_test, y_test):.2%}")
-94.24%
-
-```
-
 #### Random balanced
 
 The most basic strategy is to organize labels into a random hierarchy. The `RandomBalancedHierarchyClassifier` does just this, by creating a balanced tree. The randomness is controlled with the `seed` parameter.
@@ -131,7 +97,7 @@ You can use the `to_graphviz` method of a model's `tree_` attribute to obtain a 
 
 ☝️ Note that the [`graphviz` library](https://graphviz.readthedocs.io/en/stable/) is not installed by default because it requires a platform dependent binary. Therefore, you have to [install it](https://graphviz.readthedocs.io/en/stable/#installation) by yourself.
 
-#### Optimal hierarchy
+#### Optimal
 
 It's also possible to search the spaces of all possible hierarchies, and pick the best one. Hierarchies are compared with each other by estimating their performance with cross-validation.
 
@@ -141,11 +107,11 @@ It's also possible to search the spaces of all possible hierarchies, and pick th
 >>> model = myriade.multiclass.OptimalHierarchyClassifier(
 ...     classifier=linear_model.LogisticRegression(),
 ...     cv=model_selection.KFold(2),
-...     scorer=metrics.make_scorer(metrics.accuracy_score),
+...     scorer=metrics.make_scorer(metrics.f1_score),
 ... )
 >>> model = model.fit(X_train, y_train)
 >>> print(f"{model.score(X_test, y_test):.2%}")
-96.90%
+98.89%
 
 ```
 
@@ -177,6 +143,41 @@ The only downside to this method is that the amount of possible hierarchies grow
 | 10               | 34,459,425                     |
 
 This method is therefore only useful for benchmarking purposes. Indeed, for a small number of labels, it's useful to know if a hierarchy is optimal in some sense.
+
+#### Manual
+
+You can also specify a hierarchy manually via the `myriade.Branch` class.
+
+```py
+>>> b = myriade.Branch
+>>> tree = b(
+...     b(0, 1),
+...     b(
+...         2,
+...         b(3, 4)
+...     )
+... )
+>>> dot = tree.to_graphviz()
+>>> path = dot.render('manual', directory='img', format='svg', cleanup=True)
+
+```
+
+</br>
+<div align="center">
+    <img src="img/manual.svg">
+</div>
+</br>
+
+```py
+>>> model = myriade.multiclass.ManualHierarchyClassifier(
+...     classifier=linear_model.LogisticRegression(),
+...     tree=tree
+... )
+>>> model = model.fit(X_train, y_train)
+>>> print(f"{model.score(X_test, y_test):.2%}")
+94.24%
+
+```
 
 ### Balanced
 

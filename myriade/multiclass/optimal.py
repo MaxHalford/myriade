@@ -28,8 +28,11 @@ class OptimalHierarchyClassifier(myriade.base.HierarchyClassifier):
     def _score_tree(self, X, y, tree):
         """Score a tree by cross-validation."""
 
+        model = myriade.multiclass.ManualHierarchyClassifier(
+            classifier=self.classifier, tree=tree
+        )
         cv_results = model_selection.cross_validate(
-            self.classifier, X, y, cv=self.cv, scoring=self.scorer
+            model, X, y, cv=self.cv, scoring=self.scorer
         )
 
         return np.mean(cv_results["test_score"])
