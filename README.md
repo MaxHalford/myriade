@@ -107,7 +107,7 @@ It's also possible to search the spaces of all possible hierarchies, and pick th
 >>> model = myriade.multiclass.OptimalHierarchyClassifier(
 ...     classifier=linear_model.LogisticRegression(),
 ...     cv=model_selection.KFold(2),
-...     scorer=metrics.make_scorer(metrics.f1_score),
+...     scorer=metrics.make_scorer(metrics.accuracy_score),
 ... )
 >>> model = model.fit(X_train, y_train)
 >>> print(f"{model.score(X_test, y_test):.2%}")
