@@ -193,19 +193,23 @@ The above methods are baselines: they're either too naïve, or too greedy. A sma
 First, a base model produces cross-validated predictions. A confusion matrix is built. The two classes which most confused with each other form a branch. The process is repeated until all classes have been paired together. Next, the confusion matrix is shrinked to that pairs of labels are compared with each other. Then the pairing process is repeated. After roughly `log2(k)` steps, a balanced tree is obtained.
 
 ```py
->>> cv = model_selection.ShuffleSplit(
-...     n_splits=1,
-...     train_size=0.5,
+>>> base_model = myriade.multiclass.RandomBalancedHierarchyClassifier(
+...     classifier=linear_model.LogisticRegression(),
+...     seed=42
+... )
+>>> cv = model_selection.KFold(
+...     n_splits=2,
+...     shuffle=True,
 ...     random_state=42
 ... )
->>> base_model = myriade.multiclass.RandomBalancedHierarchyClassifier(clf)
 >>> model = myriade.multiclass.BalancedHierarchyClassifier(
-...     classifier=clf,
-...     cv=cv,
-...     base_model=base_model
+...     classifier=linear_model.LogisticRegression(),
+...     base_model=base_model,
+...     cv=cv
 ... )
->>> model.fit(X_train, y_train)
+>>> model = model.fit(X_train, y_train)
 >>> print(f"{model.score(X_test, y_test):.2%}")
+98.45%
 
 ```
 

@@ -22,7 +22,7 @@ class OptimalHierarchyClassifier(myriade.base.HierarchyClassifier):
 
     def __init__(self, classifier, cv=None, scorer=None):
         super().__init__(classifier)
-        self.cv = cv or model_selection.KFold(n_splits=2)
+        self.cv = cv or model_selection.KFold(n_splits=2, shuffle=True)
         self.scorer = scorer or metrics.make_scorer(metrics.accuracy_score)
 
     def _score_tree(self, X, y, tree):
