@@ -225,6 +225,8 @@ poetry install --dev
 pytest
 ```
 
+There's a small roadmap [here](https://github.com/users/MaxHalford/projects/1/views/1) if you're willing to contribute and looking for ideas 🙏
+
 ## License
 
 This project is free and open-source software licensed under the [MIT license](LICENSE).
