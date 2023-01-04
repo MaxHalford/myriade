@@ -27,6 +27,8 @@ Extreme multiclass classification problems are situations where the number of la
 
 This Python package provides methods to address multiclass classification. It takes a hierarchical approach. The idea being to organize labels into a binary tree, and train a binary classifier at each node.
 
+*🏗️ The package is not prime time ready yet, but the existing code is tested and usable.*
+
 ## Installation
 
 ```py
@@ -185,6 +187,39 @@ You can also specify a hierarchy manually via the `myriade.Branch` class.
 ```
 
 ### Balanced
+
+The above methods are baselines: they're either too naïve, or too greedy. A smarter idea is to use some sort of heuristic for building the hierarchy. The `BalancedHierarchyClassifier` builds a hierarchy by studying a confusion matrix.
+
+First, a base model produces cross-validated predictions. A confusion matrix is built. The two classes which most confused with each other form a branch. The process is repeated until all classes have been paired together. Next, the confusion matrix is shrinked to that pairs of labels are compared with each other. Then the pairing process is repeated. After roughly `log2(k)` steps, a balanced tree is obtained.
+
+```py
+>>> cv = model_selection.ShuffleSplit(
+...     n_splits=1,
+...     train_size=0.5,
+...     random_state=42
+... )
+>>> base_model = myriade.multiclass.RandomBalancedHierarchyClassifier(clf)
+>>> model = myriade.multiclass.BalancedHierarchyClassifier(
+...     classifier=clf,
+...     cv=cv,
+...     base_model=base_model
+... )
+>>> model.fit(X_train, y_train)
+>>> print(f"{model.score(X_test, y_test):.2%}")
+
+```
+
+```py
+>>> dot = model.tree_.to_graphviz()
+>>> path = dot.render('balanced', directory='img', format='svg', cleanup=True)
+
+```
+
+</br>
+<div align="center">
+    <img src="img/balanced.svg">
+</div>
+</br>
 
 ## Multi-label
 
