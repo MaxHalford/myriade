@@ -210,7 +210,7 @@ You can also specify a hierarchy manually via the `myriade.Branch` class.
 
 ### Balanced
 
-The above methods are baselines: they're either too naïve, or too greedy. A smarter idea is to use some sort of heuristic for building the hierarchy. The `BalancedHierarchyClassifier` builds a hierarchy by studying a confusion matrix.
+The above methods are baselines: they're either too naïve, or too greedy. A smarter idea is to use some sort of heuristic for building the hierarchy. The `BalancedHierarchyClassifier` builds a hierarchy by studying a confusion matrix. It is very similar to the method proposed in [Label Embedding Trees for Large Multi-Class Tasks](http://people.ee.duke.edu/~lcarin/NIPS_bengio_2010.pdf) by Bengio/Weston/Grangier in 2010 at NeurIPS.
 
 First, a base model produces cross-validated predictions. A confusion matrix is built. The two classes which most confused with each other form a branch. The process is repeated until all classes have been paired together. Next, the confusion matrix is shrinked to that pairs of labels are compared with each other. Then the pairing process is repeated. After roughly `log2(k)` steps, a balanced tree is obtained.
 
