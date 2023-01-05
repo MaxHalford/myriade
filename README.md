@@ -1,6 +1,6 @@
 <div align="center">
   <h1>myriade</h1>
-  <q><i>Hierarchical extreme multiclass and multi-label classification.</i></q>
+  <q>✨🌲 Hierarchical extreme multiclass and multi-label classification.</q>
 </div>
 <br>
 
