@@ -9,7 +9,7 @@ Hierarchical extreme multiclass and multi-label classification.
 - [Motivation](#motivation)
 - [Installation](#installation)
 - [Multiclass](#multiclass)
-  - [Dataset](#dataset)
+  - [Example dataset](#example-dataset)
   - [Baselines](#baselines)
     - [Random balanced](#random-balanced)
     - [Optimal](#optimal)
@@ -27,7 +27,7 @@ Extreme multiclass classification problems are situations where the number of la
 
 This Python package provides methods to address multiclass classification. It takes a hierarchical approach. The idea being to organize labels into a binary tree, and train a binary classifier at each node.
 
-*🏗️ The package is not prime time ready yet, but the existing code is tested and usable.*
+🏗️ The package is not prime time ready yet, but the existing code is tested and usable. You can use it to perform multiclass classification, but not multi-label classification.
 
 ## Installation
 
@@ -38,7 +38,7 @@ pip install myriade
 
 ## Multiclass
 
-### Dataset
+### Example dataset
 
 A multiclass classification dataset contains a 2D matrix/dataframe of features, and a 1D array/series of labels.
 
@@ -64,6 +64,8 @@ For these examples, we'll load the first 5 digits of the UCI ML hand-written dig
 
 ```
 
+In this case there's only 5 classes, so of course you could just use [scikit-learn's `OneVsRestClassifier`](https://scikit-learn.org/stable/modules/generated/sklearn.multiclass.OneVsRestClassifier.html). The point of this package is to scale to hundreds of thousands of classes, in which case a `OneVsRestClassifier` would be way too slow.
+
 ### Baselines
 
 #### Random balanced
@@ -71,8 +73,6 @@ For these examples, we'll load the first 5 digits of the UCI ML hand-written dig
 The most basic strategy is to organize labels into a random hierarchy. The `RandomBalancedHierarchyClassifier` does just this, by creating a balanced tree. The randomness is controlled with the `seed` parameter.
 
 ```py
->>> from sklearn import linear_model
-
 >>> model = myriade.multiclass.RandomBalancedHierarchyClassifier(
 ...     classifier=linear_model.LogisticRegression(),
 ...     seed=42
