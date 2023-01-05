@@ -1,6 +1,26 @@
-<h1>myriade</h1>
+<div align="center">
+  <h1>myriade</h1>
+  <q><i>Hierarchical extreme multiclass and multi-label classification.</i></q>
+</div>
+<br>
 
-Hierarchical extreme multiclass and multi-label classification.
+<div align="center">
+  <!-- Tests -->
+  <a href="https://github.com/MaxHalford/myriade/actions/workflows/unit-tests.yml">
+    <img src="https://github.com/MaxHalford/myriade/actions/workflows/unit-tests.yml/badge.svg?style=flat-square" alt="tests">
+  </a>
+  <!-- PyPI -->
+  <a href="https://pypi.org/project/myriade">
+    <img src="https://img.shields.io/pypi/v/myriade.svg?label=release&color=blue&style=flat-square" alt="pypi">
+  </a>
+  <!-- License -->
+  <a href="https://opensource.org/licenses/MIT">
+    <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="license">
+  </a>
+</div>
+<br>
+
+
 
 <div align="center">
     <img src="img/night-sky.jpg" width="42%" align="right" alt="https://www.reddit.com/r/drawing/comments/84j0gn/night_sky_9x9in_pen/">
@@ -27,7 +47,7 @@ Extreme multiclass classification problems are situations where the number of la
 
 This Python package provides methods to address multiclass classification. It takes a hierarchical approach. The idea being to organize labels into a binary tree, and train a binary classifier at each node.
 
-🏗️ The package is not prime time ready yet, but the existing code is tested and usable. You can use it to perform multiclass classification, but not multi-label classification.
+🏗️ The package is not prime time ready yet, but the existing code is tested and usable. You can use it to perform multiclass classification, but not multi-label classification. Stay tuned! You can also [contribute](#contributing) 🙃
 
 ## Installation
 
@@ -73,6 +93,8 @@ In this case there's only 5 classes, so of course you could just use [scikit-lea
 The most basic strategy is to organize labels into a random hierarchy. The `RandomBalancedHierarchyClassifier` does just this, by creating a balanced tree. The randomness is controlled with the `seed` parameter.
 
 ```py
+>>> from sklearn import linear_model
+
 >>> model = myriade.multiclass.RandomBalancedHierarchyClassifier(
 ...     classifier=linear_model.LogisticRegression(),
 ...     seed=42
